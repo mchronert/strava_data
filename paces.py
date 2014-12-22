@@ -74,6 +74,7 @@ def avgHR(run, start_point, end_point):
 	avg_HR = np.mean(HR)
 	return avg_HR
 	
+	
 def run_info(run, interval):
 	"""combine all the required info at the given interval for the whole run file"""
 	splits = []
@@ -83,7 +84,9 @@ def run_info(run, interval):
 	for pt in range(0, len(run)-1):
 		distance += point_distance(run[pt][0], run[pt+1][0])
 		if distance > next_int:
-			splits.append([time_split(run[start][2], run[pt][2]), round(avgHR(run, start, pt),2)])
+			splits.append([time_split(run[start][2], run[pt][2]), 
+						round(avgHR(run, start, pt),2),
+						 round(float(run[pt][3])-float(run[start][3]))])
 			start = pt + 1
 			next_int = distance + interval		
 	return splits

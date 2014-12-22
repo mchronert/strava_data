@@ -1,4 +1,6 @@
 import paces as pc
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 data_set = pc.runs #data set is the list of runs
@@ -23,17 +25,31 @@ def data_combinator(runs, interval):
 		
 data = data_combinator(runs_list(["2014"], pc.runs), 1.0)
 
-#convert HR and pace to individual lists
-hr = [data[i][1] for i in range(0,len(data))]	
-pace = [data[i][0] / 60. for i in range(0, len(data))]
+#convert HR, pace and elevation into dataframe
+hr = pd.Series(data=[data[i][1] for i in range(0,len(data))])
+pace = pd.Series(data=[data[i][0] / 60. for i in range(0, len(data))])
+elev = pd.Series(data=[data[i][2] for i in range(0,len(data))])
+hr.name = 'hr'
+pace.name= 'pace'
+elev.name = 'net elevation'
+
+df = pd.DataFrame(zip(hr,pace, elev), columns=[hr.name, pace.name, elev.name])
+norm_elev = df[df['net elevation'] < 50]
+
+
 
 #create scatter plot of the data
-plt.plot(hr, pace, 'go')
+plt.scatter(norm_elev["hr"], norm_elev["pace"])
 plt.xlabel('Heart Rate')
 plt.ylabel('Minutes per Mile')
 plt.title('Heart Rate vs Pace')
 plt.axis([120, 195, 5.5, 10])
 plt.show()
+
+
+
+
+#plt.show()
 
 
  		
