@@ -84,7 +84,7 @@ def run_info(run, interval):
 	for pt in range(0, len(run)-1):
 		distance += point_distance(run[pt][0], run[pt+1][0])
 		if distance > next_int:
-			splits.append([time_split(run[start][2], run[pt][2]), 
+			splits.append([round(time_split(run[start][2], run[pt][2])/60,2), 
 						round(avgHR(run, start, pt),2),
 						 round(float(run[pt][3])-float(run[start][3]))])
 			start = pt + 1

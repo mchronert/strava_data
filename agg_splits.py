@@ -1,6 +1,7 @@
 import paces as pc
 import pandas as pd
 import numpy as np
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
 data_set = pc.runs #data set is the list of runs
@@ -25,21 +26,27 @@ def data_combinator(runs, interval):
 		
 data = data_combinator(runs_list(["2014"], pc.runs), 1.0)
 
-#convert HR, pace and elevation into dataframe
-hr = pd.Series(data=[data[i][1] for i in range(0,len(data))])
-pace = pd.Series(data=[data[i][0] / 60. for i in range(0, len(data))])
-elev = pd.Series(data=[data[i][2] for i in range(0,len(data))])
-hr.name = 'hr'
-pace.name= 'pace'
-elev.name = 'net elevation'
+# convert data into a pandas dataframe
+df = pd.DataFrame(data, columns = ['pace', 'hr', 'elevation'])
+adj = df[(df['elevation'] < 25) & (df['pace'] < 8.00)]
 
-df = pd.DataFrame(zip(hr,pace, elev), columns=[hr.name, pace.name, elev.name])
-norm_elev = df[df['net elevation'] < 50]
+#regression analysis on the adjusted data
+y = adj['pace']
+x = adj['hr']
+x = sm.add_constant(x) # need to add a constant to the independent variable
 
+reg = sm.OLS(y, x)
+reg = reg.fit()
+
+# create the regression line
+X_prime = np.linspace(adj['hr'].min(), adj['hr'].max(), len(adj['hr']))
+X_prime = sm.add_constant(X_prime)  # add constant as we did before
+y_hat = reg.predict(X_prime)
 
 
 #create scatter plot of the data
-plt.scatter(norm_elev["hr"], norm_elev["pace"])
+plt.scatter(adj["hr"], adj["pace"])
+plt.plot(X_prime, y_hat, "r")
 plt.xlabel('Heart Rate')
 plt.ylabel('Minutes per Mile')
 plt.title('Heart Rate vs Pace')
@@ -49,7 +56,7 @@ plt.show()
 
 
 
-#plt.show()
+
 
 
  		
